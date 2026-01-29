@@ -5,6 +5,7 @@ const app = express()
 const port = process.env.PORT || 3000
 const authRoute = require("./routes/authRoute")
 const messageRoute = require("./routes/messageRoute")
+const db = require("./config/db");
 
 // Middlewares
 app.use(express.json())
