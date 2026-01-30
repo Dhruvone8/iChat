@@ -1,11 +1,11 @@
 const User = require("../models/userModel")
 const bcrypt = require("bcrypt")
+const generateToken = require("../utils/generateToken")
 
 const handleRegistration = async (req, res) => {
     const { fullName, email, password } = req.body
 
     try {
-
         // Check if all the fields are filled
         if (!fullName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" })
@@ -40,9 +40,33 @@ const handleRegistration = async (req, res) => {
             password: hashedPassword
         })
 
+        if(newUser) {
+            // Generate token & cookie
+            generateToken(newUser._id, res)
+
+            res.status(201).json({
+                success: true,
+            message: "User registered successfully",
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            email: newUser.email,
+        });
+    } else {
+        res.status(400).json({
+            success: false,
+            message: "User registration failed"
+        })
+    }
+
     } catch (error) {
         console.error("Error in handleRegistration:", error.message)
-        res.status(500).json({ message: "Internal server error" })
-
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
     }
+}
+
+module.exports = {
+    handleRegistration
 }
