@@ -2,9 +2,11 @@ const User = require("../models/userModel")
 const bcrypt = require("bcrypt")
 const generateToken = require("../utils/generateToken")
 const { sendWelcomeEmail } = require("../emails/emailHandlers")
+const cloudinary = require("../config/cloudinary")
 const dotenv = require("dotenv");
 dotenv.config();
 
+// Registration Controller
 const handleRegistration = async (req, res) => {
     const { fullName, email, password } = req.body
 
@@ -77,6 +79,7 @@ const handleRegistration = async (req, res) => {
     }
 }
 
+// Login Controller
 const handleLogin = async (req, res) => {
 
     const { email, password } = req.body;
@@ -120,6 +123,7 @@ const handleLogin = async (req, res) => {
     }
 }
 
+// Logout Controller
 const handleLogout = async (req, res) => {
     res.cookie("jwt", "", {
         maxAge: 0
@@ -129,6 +133,35 @@ const handleLogout = async (req, res) => {
         success: true,
         message: "Logged Out successfully"
     })
+}
+
+// Update Profile Controller
+const handleUpdateProfile = async (req, res) => {
+    try {
+        const { profilePic } = req.body;
+        if (!profilePic) {
+            return res.status(400).json({ message: "Profile picture is required" })
+        }
+
+        const userId = req.user._id;
+
+        const result = await cloudinary.uploader.upload(profilePic)
+
+        const updatedUser = await user.findByIdAndUpdate(userId, { profilePic: result.secureUrl }, { new: true })
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: updatedUser
+        })
+
+    } catch (error) {
+        console.error("Error in handleUpdateProfile:", error.message)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
 }
 
 module.exports = {
