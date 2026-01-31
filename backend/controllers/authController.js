@@ -1,6 +1,9 @@
 const User = require("../models/userModel")
 const bcrypt = require("bcrypt")
 const generateToken = require("../utils/generateToken")
+const { sendWelcomeEmail } = require("../emails/emailHandlers")
+const dotenv = require("dotenv");
+dotenv.config();
 
 const handleRegistration = async (req, res) => {
     const { fullName, email, password } = req.body
@@ -9,7 +12,7 @@ const handleRegistration = async (req, res) => {
         // Check if all the fields are filled
         if (!fullName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" })
-        }
+        }   
 
         // Check password length validation
         if (password.length < 6) {
@@ -40,23 +43,30 @@ const handleRegistration = async (req, res) => {
             password: hashedPassword
         })
 
-        if(newUser) {
+        if (newUser) {
             // Generate token & cookie
             generateToken(newUser._id, res)
 
             res.status(201).json({
                 success: true,
-            message: "User registered successfully",
-            _id: newUser._id,
-            fullName: newUser.fullName,
-            email: newUser.email,
-        });
-    } else {
-        res.status(400).json({
-            success: false,
-            message: "User registration failed"
-        })
-    }
+                message: "User registered successfully",
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+            });
+
+            // Send Welcome Email
+            try {
+                await sendWelcomeEmail(newUser.email, newUser.fullName, process.env.CLIENT_URL)
+            } catch (error) {
+                console.error("Failed to send welcome email", error)
+            }
+        } else {
+            res.status(400).json({
+                success: false,
+                message: "User registration failed"
+            })
+        }
 
     } catch (error) {
         console.error("Error in handleRegistration:", error.message)

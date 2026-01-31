@@ -1,5 +1,5 @@
-export function createWelcomeEmailTemplate(name, clientURL) {
-    return `
+function createWelcomeEmailTemplate(name, clientURL) {
+  return `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -47,4 +47,8 @@ export function createWelcomeEmailTemplate(name, clientURL) {
   </body>
   </html>
   `;
+}
+
+module.exports = {
+  createWelcomeEmailTemplate,
 }
