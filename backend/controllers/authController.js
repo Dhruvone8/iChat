@@ -82,18 +82,26 @@ const handleLogin = async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Input Validation
+        if (!email || !password) {
+            return res.status(400).json({ message: "All fields are required" })
+        }
+
+        // Check if the user exists
         const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(400).json({ message: "Invalid Credentials" })
         }
 
+        // Check if the password is valid
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Invalid Credentials" })
         }
 
+        // Generate token & cookie
         generateToken(user._id, res)
 
         res.status(200).json({
