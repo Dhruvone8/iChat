@@ -167,5 +167,6 @@ const handleUpdateProfile = async (req, res) => {
 module.exports = {
     handleRegistration,
     handleLogin,
-    handleLogout
+    handleLogout,
+    handleUpdateProfile
 }

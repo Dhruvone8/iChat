@@ -11,6 +11,8 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@arcjet/inspect": "^1.0.0",
+    "@arcjet/node": "^1.0.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",
