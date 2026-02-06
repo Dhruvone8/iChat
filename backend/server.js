@@ -7,9 +7,14 @@ const authRoute = require("./routes/authRoute")
 const messageRoute = require("./routes/messageRoute")
 const db = require("./config/db");
 const cookieParser = require("cookie-parser")
+const cors = require("cors");
 
 // Middlewares
 app.use(express.json())
+app.use(cors({
+    origin:process.env.CLIENT_URL,
+    credentials:true
+}))
 app.use(cookieParser())
 
 // Routes
