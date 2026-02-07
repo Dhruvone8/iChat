@@ -3,7 +3,7 @@ import Chat from './pages/Chat'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
-import { useAuthStore } from './store/useAuthStore'
+import { useAuthStore } from './store/AuthStore'
 import PageLoader from './components/PageLoader'
 import { Toaster } from 'react-hot-toast'
 
@@ -16,7 +16,6 @@ const App = () => {
   }, [])
 
   if (isCheckingAuth) return <PageLoader />
-
 
   return (
     <div className="min-h-screen bg-slate-900 relative flex items-center justify-center p-4 overflow-hidden">

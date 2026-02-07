@@ -13,6 +13,11 @@ router.post("/login", arcjetProtection, handleLogin);
 // Logout Route
 router.post("/logout", arcjetProtection, handleLogout);
 
+// Auth Check Route
+router.get("/check", isLoggedIn, (req, res) => {
+    res.status(200).json(req.user);
+})
+
 // Update Profile
 router.put("/update-profile", arcjetProtection, isLoggedIn, handleUpdateProfile);
 
