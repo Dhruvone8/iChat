@@ -1,63 +1,84 @@
 import { create } from 'zustand';
 import { axiosInstance } from "../lib/axios";
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
-    authUser: null,
     isCheckingAuth: true,
     isSigningUp: false,
     isLoggingIn: false,
 
     checkAuth: async () => {
         try {
-            const res = await axiosInstance.get("/auth/check")
-            set({ authUser: res.data })
+            const res = await axiosInstance.get("/auth/check");
+
+            set({ authUser: res.data });
+            localStorage.setItem("authUser", JSON.stringify(res.data));
+
         } catch (error) {
-            console.error("Error in checking auth", error)
-            set({ authUser: null })
+            set({ authUser: null });
+            localStorage.removeItem("authUser");
         } finally {
-            set({ isCheckingAuth: false })
+            set({ isCheckingAuth: false });
         }
     },
 
     signup: async (data) => {
-        set({ isSigningUp: true })
+        set({ isSigningUp: true });
         try {
-            const res = await axiosInstance.post("/auth/register", data)
-            set({ authUser: res.data });
+            const res = await axiosInstance.post("/auth/register", data);
 
-            toast.success("Account Created Successfully!")
+            set({ authUser: res.data });
+            localStorage.setItem("authUser", JSON.stringify(res.data)); // persist user
+
+            toast.success("Account Created Successfully!");
         } catch (error) {
-            console.error("Error in signup", error)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || "Signup failed");
         } finally {
-            set({ isSigningUp: false })
+            set({ isSigningUp: false });
         }
     },
 
     login: async (data) => {
-        set({ isLoggingIn: true })
+        set({ isLoggingIn: true });
         try {
-            const res = await axiosInstance.post("/auth/login", data)
-            set({ authUser: res.data });
+            const res = await axiosInstance.post("/auth/login", data);
 
-            toast.success("Logged In Successfully!")
+            set({ authUser: res.data });
+            localStorage.setItem("authUser", JSON.stringify(res.data)); // persist user
+
+            toast.success("Logged In Successfully!");
         } catch (error) {
-            console.error("Error in login", error)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || "Login failed");
         } finally {
-            set({ isLoggingIn: false })
+            set({ isLoggingIn: false });
         }
     },
 
-    logout: async() => {
+    logout: async () => {
         try {
-            await axiosInstance.post("/auth/logout")
-            set({ authUser: null })
-            toast.success("Logged Out Successfully!")
+            await axiosInstance.post("/auth/logout");
+
+            set({ authUser: null });
+            localStorage.removeItem("authUser");
+
+            toast.success("Logged Out Successfully!");
         } catch (error) {
-            console.error("Error in logout", error)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || "Logout failed");
+        }
+    },
+
+    updateProfile: async (data) => {
+        try {
+            const res = await axiosInstance.put("/auth/update-profile", data);
+
+            const updatedUser = res.data.user;
+
+            set({ authUser: updatedUser });
+            localStorage.setItem("authUser", JSON.stringify(updatedUser));
+
+            toast.success("Profile updated successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Profile update failed");
         }
     }
-}))
+}));

@@ -16,12 +16,14 @@ const ProfileHeader = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onloadend = () => {
+
+    reader.onloadend = async () => {
       const base64Img = reader.result;
       setSelectedImg(base64Img);
-      
+      await updateProfile({ profilePic: base64Img });
     };
   }
 
@@ -31,7 +33,8 @@ const ProfileHeader = () => {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="avatar avatar-online">
-            <button className="size-14 rounded-full overflow-hidden relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
+            <button className="size-14 rounded-full overflow-hidden relative group cursor-pointer"
+              onClick={() => fileInputRef.current.click()}>
               <img src={selectedImg || authUser.profilePic || '/avatar.png'} alt="User Image" className="size-full object-cover" />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 
               transition-opacity flex items-center justify-center">
@@ -39,16 +42,16 @@ const ProfileHeader = () => {
             </button>
             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
           </div>
+
+          {/* UserName & Online Text */}
           <div>
-            {/* UserName & Online Text */}
-            <div>
-              <h3 className="text-slate-200 font-medium text-base max-w-[180px] truncate">
-                {authUser.fullName}
-              </h3>
-              <p className="text-xs text-slate-400">Online</p>
-            </div>
+            <h3 className="text-slate-200 font-medium text-base max-w-[180px] truncate">
+              {authUser.fullName}
+            </h3>
+            <p className="text-xs text-slate-400">Online</p>
           </div>
         </div>
+
         {/* Buttons */}
         <div className="flex gap-4 items-center">
           {/* Logout Button */}
