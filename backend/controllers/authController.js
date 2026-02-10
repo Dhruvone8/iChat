@@ -112,6 +112,8 @@ const handleLogin = async (req, res) => {
             message: "Logged In successfully",
             _id: user._id,
             email: user.email,
+            fullName: user.fullName,
+            profilePic: user.profilePic,
         });
 
     } catch (error) {
