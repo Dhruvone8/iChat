@@ -30,7 +30,7 @@ const handleGetChatById = async (req, res) => {
         const myId = req.user._id;
         const { id } = req.params;
 
-        const message = await Message.find({
+        const messages = await Message.find({
             $or: [
                 { senderId: myId, receiverId: id },
                 { senderId: id, receiverId: myId }
@@ -40,7 +40,7 @@ const handleGetChatById = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Chat fetched successfully",
-            message
+            messages
         })
 
     } catch (error) {
