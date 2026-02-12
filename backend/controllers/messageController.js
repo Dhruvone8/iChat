@@ -102,8 +102,7 @@ const handleSendMessage = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: "Message sent successfully",
-            newMessage
+            message: newMessage
         });
     } catch (error) {
         console.error("Error in handleSendMessage:", error.message)

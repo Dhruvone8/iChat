@@ -29,10 +29,13 @@ const ChatContainer = () => {
                   {msg.image && (
                     <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
                   )}
-                  {msg.test && <p className="mt-2">{msg.text}</p>}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
-                    {new Date(msg.createdAt).toISOString().slice(11, 16)}
-                  </p>
+                  {msg.text && <p className="mt-2">{msg.text}</p>}
+                  {msg.createdAt && !isNaN(new Date(msg.createdAt))
+                    ? new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                    : ""}
                 </div>
               </div>
             ))}
