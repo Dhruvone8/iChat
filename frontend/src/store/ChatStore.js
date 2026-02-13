@@ -58,7 +58,7 @@ export const useChatStore = create((set, get) => ({
     },
 
     sendMessage: async (messageData) => {
-        const { selectedUser } = get()
+        const { selectedUser, messages } = get()
         const { authUser } = useAuthStore.getState()
 
         const tempId = `temp-${Date.now()}`
@@ -74,14 +74,16 @@ export const useChatStore = create((set, get) => ({
 
         // Immediately update the UI
         set({
-            messages: [...get().messages, optimisticMessage]
+            messages: [...messages, optimisticMessage]
         })
 
         try {
             const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData)
             set({
                 messages: get().messages.map(msg =>
-                    msg._id === tempId ? res.data.message : msg
+                    msg._id === tempId
+                        ? { ...msg, ...res.data.message, _id: tempId, serverId: res.data.message._id }
+                        : msg
                 )
             })
         } catch (error) {
