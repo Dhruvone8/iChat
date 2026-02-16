@@ -8,7 +8,6 @@ import PageLoader from './components/PageLoader'
 import { Toaster } from 'react-hot-toast'
 
 const App = () => {
-
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore()
 
   useEffect(() => {

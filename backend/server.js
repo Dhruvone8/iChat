@@ -1,7 +1,7 @@
 const express = require("express")
 const dotenv = require("dotenv")
+const { app, server } = require("./utils/socket")
 dotenv.config()
-const app = express()
 const port = process.env.PORT || 3000
 const authRoute = require("./routes/authRoute")
 const messageRoute = require("./routes/messageRoute")
@@ -21,4 +21,4 @@ app.use(cookieParser())
 app.use("/auth", authRoute)
 app.use("/messages", messageRoute)
 
-app.listen(port, () => console.log(`Server running on port ${port}`))
+server.listen(port, () => console.log(`Server running on port ${port}`))

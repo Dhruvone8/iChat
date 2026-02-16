@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 import { axiosInstance } from "../lib/axios";
 import { toast } from "react-hot-toast";
+import { io } from "socket.io-client";
 
-export const useAuthStore = create((set) => ({
+const baseURL = import.meta.env.MODE === "development" ? "http://localhost:3000/" : "/";
+
+export const useAuthStore = create((set, get) => ({
     isCheckingAuth: true,
     isSigningUp: false,
     isLoggingIn: false,
+    authUser: null,
+    socket: null,
+    onlineUsers: [],
 
     checkAuth: async () => {
         try {
@@ -13,6 +19,7 @@ export const useAuthStore = create((set) => ({
 
             set({ authUser: res.data });
             localStorage.setItem("authUser", JSON.stringify(res.data));
+            get().connectSocket();
 
         } catch (error) {
             set({ authUser: null });
@@ -31,6 +38,7 @@ export const useAuthStore = create((set) => ({
             localStorage.setItem("authUser", JSON.stringify(res.data)); // persist user
 
             toast.success("Account Created Successfully!");
+            get().connectSocket();
         } catch (error) {
             toast.error(error.response?.data?.message || "Signup failed");
         } finally {
@@ -47,6 +55,7 @@ export const useAuthStore = create((set) => ({
             localStorage.setItem("authUser", JSON.stringify(res.data)); // persist user
 
             toast.success("Logged In Successfully!");
+            get().connectSocket();
         } catch (error) {
             toast.error(error.response?.data?.message || "Login failed");
         } finally {
@@ -60,8 +69,8 @@ export const useAuthStore = create((set) => ({
 
             set({ authUser: null });
             localStorage.removeItem("authUser");
-
             toast.success("Logged Out Successfully!");
+            get().disconnectSocket();
         } catch (error) {
             toast.error(error.response?.data?.message || "Logout failed");
         }
@@ -79,6 +88,28 @@ export const useAuthStore = create((set) => ({
             toast.success("Profile updated successfully!");
         } catch (error) {
             toast.error(error.response?.data?.message || "Profile update failed");
+        }
+    },
+
+    connectSocket: () => {
+        const { authUser } = get();
+
+        if (!authUser || get().socket?.connected) return;
+
+        const socket = io(baseURL, { withCredentials: true });
+
+        socket.connect();
+        set({ socket });
+
+        // Listen for online users event
+        socket.on("onlineUsers", (userIds) => {
+            set({ onlineUsers: userIds });
+        });
+    },
+
+    disconnectSocket: () => {
+        if (get().socket?.connected) {
+            get().socket.disconnect();
         }
     }
 }));
