@@ -1,7 +1,7 @@
 const Message = require("../models/messageModel")
 const User = require("../models/userModel")
 const cloudinary = require("../config/cloudinary");
-const { getReceiverSocketId } = require("../utils/socket");
+const { getReceiverSocketId, io } = require("../utils/socket");
 
 // Get all Contacts
 const handleGetAllContacts = async (req, res) => {
@@ -57,7 +57,7 @@ const handleGetChatById = async (req, res) => {
 const handleSendMessage = async (req, res) => {
     try {
         const { text, image } = req.body;
-        const { id } = req.params;
+        const { id: receiverId } = req.params;
         const senderId = req.user._id;
 
         // Message Input Validation
@@ -69,7 +69,7 @@ const handleSendMessage = async (req, res) => {
         }
 
         // Can't Send Message to Yourself
-        if (senderId.equals(id)) {
+        if (senderId.equals(receiverId)) {
             return res.status(400).json({
                 success: false,
                 message: "Can't send message to yourself"
@@ -77,9 +77,9 @@ const handleSendMessage = async (req, res) => {
         }
 
         // Check if receiver exists
-        const receiverId = await User.exists({ _id: id });
+        const receiverExists = await User.exists({ _id: receiverId });
 
-        if (!receiverId) {
+        if (!receiverExists) {
             return res.status(404).json({
                 success: false,
                 message: "Receiver not found"
@@ -96,11 +96,12 @@ const handleSendMessage = async (req, res) => {
 
         const newMessage = await Message.create({
             senderId,
-            receiverId: id,
+            receiverId,
             text,
             image: imageUrl
         })
 
+        // Get receiver's socket ID and emit the message
         const receiverSocketId = getReceiverSocketId(receiverId);
 
         if (receiverSocketId) {
