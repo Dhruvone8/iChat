@@ -9,7 +9,6 @@ const BorderAnimator = ({children}) => {
     flex overflow-hidden">
       {children}
     </div>
-
   )
 }
 

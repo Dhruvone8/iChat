@@ -4,7 +4,6 @@ import {useAuthStore} from '../store/AuthStore'
 import { XIcon } from 'lucide-react'
 
 const ChatHeader = () => {
-
     const { selectedUser, setSelectedUser } = useChatStore();
     const {onlineUsers} = useAuthStore();
     const isOnline = onlineUsers.includes(selectedUser._id)
@@ -13,7 +12,6 @@ const ChatHeader = () => {
         const handleEscKey = (e) => {
             if (e.key === "Escape") setSelectedUser(null)
         }
-
         window.addEventListener("keydown", handleEscKey)
 
         return () => {

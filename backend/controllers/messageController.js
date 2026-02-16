@@ -1,6 +1,7 @@
 const Message = require("../models/messageModel")
 const User = require("../models/userModel")
-const cloudinary = require("../config/cloudinary")
+const cloudinary = require("../config/cloudinary");
+const { getReceiverSocketId } = require("../utils/socket");
 
 // Get all Contacts
 const handleGetAllContacts = async (req, res) => {
@@ -76,9 +77,9 @@ const handleSendMessage = async (req, res) => {
         }
 
         // Check if receiver exists
-        const receiver = await User.exists({ _id: id });
+        const receiverId = await User.exists({ _id: id });
 
-        if (!receiver) {
+        if (!receiverId) {
             return res.status(404).json({
                 success: false,
                 message: "Receiver not found"
@@ -99,6 +100,12 @@ const handleSendMessage = async (req, res) => {
             text,
             image: imageUrl
         })
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
 
         res.status(201).json({
             success: true,
