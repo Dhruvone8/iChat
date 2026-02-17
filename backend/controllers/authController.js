@@ -128,7 +128,9 @@ const handleLogin = async (req, res) => {
 // Logout Controller
 const handleLogout = async (req, res) => {
     res.cookie("jwt", "", {
-        maxAge: 0
+        maxAge: 0,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     })
 
     res.status(201).json({
