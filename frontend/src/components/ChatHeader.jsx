@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import { useChatStore } from '../store/ChatStore'
-import {useAuthStore} from '../store/AuthStore'
+import { useAuthStore } from '../store/AuthStore'
 import { XIcon } from 'lucide-react'
 
 const ChatHeader = () => {
     const { selectedUser, setSelectedUser } = useChatStore();
-    const {onlineUsers} = useAuthStore();
+    const { onlineUsers } = useAuthStore();
     const isOnline = onlineUsers.includes(selectedUser._id)
 
     useEffect(() => {
@@ -33,7 +33,7 @@ const ChatHeader = () => {
                 </div>
             </div>
 
-            <button onClick={() => setSelectedUser(null)}>
+            <button onClick={() => setSelectedUser(null)} className="md:hidden">
                 <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
             </button>
         </div>
